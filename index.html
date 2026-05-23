@@ -247,9 +247,14 @@ function updateLog(){
  "SPACING: "+safeSpacing.toFixed(1);
 }
 
-function loop(){
- if(!finished)
-   hands.send({image:video});
+async function loop(){
+ if(!finished) {
+   try {
+     await hands.send({image:video});
+   } catch(err) {
+     console.error(err);
+   }
+ }
  requestAnimationFrame(loop);
 }
 video.addEventListener("loadeddata",loop);
