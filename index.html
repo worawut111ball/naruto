@@ -230,14 +230,38 @@ function animate(){
    ctx.drawImage(personImage,0,0,
      canvas.width,canvas.height);
 
-   if(revealIndex>=cloneCount){
-     finished=true;
-   }
- }
+    if(revealIndex>=cloneCount && !finished){
+      finished=true;
+      setTimeout(resetEffect, 5000);
+    }
+  }
 
- requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 }
 animate();
+
+function resetEffect() {
+  // สร้างควันระเบิดตอนหายตัว
+  for(let i=0;i<50;i++){
+    smoke.push({
+      x: canvas.width/2 + (Math.random()-0.5)*canvas.width*0.6,
+      y: canvas.height/2 + (Math.random()-0.5)*canvas.height*0.6,
+      size: 30+Math.random()*40,
+      alpha: 1,
+      vx: (Math.random()-0.5)*10,
+      vy: (Math.random()-0.5)*10
+    });
+  }
+
+  setTimeout(() => {
+    mode="idle";
+    frozenBackground=null;
+    personImage=null;
+    revealIndex=0;
+    frameCounter=0;
+    finished=false; // เริ่มประมวลผลกล้องจับมือใหม่อีกครั้ง
+  }, 200);
+}
 
 function updateLog(){
  logDiv.innerHTML=
