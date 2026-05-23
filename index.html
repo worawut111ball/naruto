@@ -54,7 +54,7 @@ body::after {
 </head>
 <body>
 
-<video id="video" autoplay playsinline></video>
+<video id="video" autoplay playsinline muted></video>
 <canvas id="canvas"></canvas>
 <div id="log"></div>
 
@@ -81,16 +81,34 @@ let revealSpeed=4;
 let frameCounter=0;
 let safeSpacing=60;
 
-// ดึงข้อมูลกล้องแบบ High-Definition (HD) เพื่อความคมชัดสูงสุด
-navigator.mediaDevices.getUserMedia({
-  video: {
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
-    facingMode: "user"
-  }
-})
-.then(s=>video.srcObject=s)
-.catch(err=>console.error("Camera access error: ", err));
+// ดึงข้อมูลกล้องแบบทนทาน (มีระบบ Fallback เพื่อป้องกันจอมืด)
+function startCamera() {
+  const hdConstraints = {
+    video: {
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      facingMode: "user"
+    }
+  };
+
+  navigator.mediaDevices.getUserMedia(hdConstraints)
+    .then(s => {
+      video.srcObject = s;
+    })
+    .catch(err => {
+      console.warn("HD Camera constraints failed, trying fallback...", err);
+      // Fallback: ใช้กล้องพื้นฐานอะไรก็ได้ที่เชื่อมต่ออยู่
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(s => {
+          video.srcObject = s;
+        })
+        .catch(e => {
+          console.error("All camera initialization attempts failed: ", e);
+          alert("ไม่สามารถเปิดใช้งานกล้องได้ กรุณาตรวจสอบสิทธิ์การเข้าถึงกล้องของเบราว์เซอร์");
+        });
+    });
+}
+startCamera();
 
 // ===== HANDS =====
 const hands=new Hands({
